@@ -1,3 +1,41 @@
+# MovieTrack
+
+## Team
+- **Team Name:** MDL
+- **Members:**
+  - Ecobescu George-Marius - Movie Management Module (CRUD Movies, search/filter by genre/year)
+  - Munteanu David - Review & Ratings Module (add/edit/delete reviews, calculate average rating)
+  - Andrei Liviu-Cristian - Watchlist System (add/remove movies, mark as watched, movie & user statistics)
+
+## Project Description
+
+MovieTrack is a SaaS application designed to help users discover, track, and review movies. Users can save movies to their personal lists, submit ratings and reviews, and keep track of what they’ve watched. The system automatically calculates the average rating for each movie based on user reviews, providing a reliable overview of movie popularity and quality.
+
+It's inspired by popular movie review platforms such as IMDb, offering a simplified, manageable, and educational version suitable for academic purposes while still providing meaningful functionality for users.
+
+### Key Features
+- Movie catalog management: add, update, delete, search, and filter by genre or release year.
+- Review and rating system with automatic average score calculation.
+- User watchlist management: add/remove movies, mark as watched.
+- Statistics and tracking: number of movies watched per user, number of ratings for each movie.
+
+### Technical Stack
+- **Backend:** Spring Boot (Java 21)
+- **Database:** MongoDB
+- **API:** RESTful
+- **Testing:** JUnit, Mockito, Cucumber
+- **Monitoring:** Prometheus, Grafana
+- **Deployment:** Docker
+
+## Contributing
+
+All team members follow trunk-based development:
+1. Create feature branch from `main`
+2. Make changes and commit with clear messages
+3. Create PR and request review
+4. Address feedback
+5. Merge after approval
+
 # Prerequisites
 
 For using Github Codespaces, no prerequisites are mandatory.
