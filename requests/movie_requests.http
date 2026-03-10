@@ -1,0 +1,48 @@
+### Create a movie
+# @name createMovie
+POST http://localhost:8080/api/movies
+Content-Type: application/json
+
+{
+  "title": "The Matrix",
+  "genre": "Action",
+  "releaseYear": 1999
+}
+
+### Create another movie
+# @name createAnotherMovie
+POST http://localhost:8080/api/movies
+Content-Type: application/json
+
+{
+  "title": "Pulp Fiction",
+  "genre": "Drama",
+  "releaseYear": 1994
+}
+
+
+### Get all movies
+GET http://localhost:8080/api/movies
+
+### Get movie by ID
+GET http://localhost:8080/api/movies/{{createMovie.response.body.id}}
+
+### Delete movie
+DELETE http://localhost:8080/api/movies/{{createAnotherMovie.response.body.id}}
+
+### Search movies by title
+GET http://localhost:8080/api/movies/search/title?title=matrix
+
+### Search movies by genre
+GET http://localhost:8080/api/movies/search/genre?genre=Action
+
+### Search movies by year
+GET http://localhost:8080/api/movies/search/year?year=1999
+
+### Add rating to movie
+POST http://localhost:8080/api/movies/{{createMovie.response.body.id}}/rating
+Content-Type: application/json
+
+{
+  "rating": 9
+}
