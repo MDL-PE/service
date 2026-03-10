@@ -91,7 +91,7 @@ public class TodoService {
                 todo.id(),
                 todo.description(),
                 todo.done(),
-                assignee.name(),
+                assignee.username(),
                 assignee.email()
         );
     }

@@ -76,7 +76,7 @@ public class UserService {
     private UserResponse toResponse(UserEntity user) {
         return new UserResponse(
                 user.id(),
-                user.name(),
+                user.username(),
                 user.email()
         );
     }
