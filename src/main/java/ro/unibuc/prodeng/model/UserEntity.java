@@ -7,6 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public record UserEntity(
     @Id
     String id,
-    String name,
-    String email
-) {}
+    String username,
+    String email,
+    String password
+) {
+    public UserEntity(String username, String email, String password) {
+        this(null, username, email, password);
+    }
+}

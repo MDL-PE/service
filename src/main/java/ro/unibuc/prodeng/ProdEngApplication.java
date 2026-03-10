@@ -30,12 +30,12 @@ public class ProdEngApplication {
 		SpringApplication.run(ProdEngApplication.class, args);
 	}
 
-	@PostConstruct
-	public void runAfterObjectCreated() {
-		if (userRepository.findByEmail("frodo@theshire.me").isEmpty()) {
-			CreateUserRequest userRequest = new CreateUserRequest("Frodo Baggins", "frodo@theshire.me");
-			userService.createUser(userRequest);
-			todoService.createTodo(new CreateTodoRequest("Take the ring to Mordor", "frodo@theshire.me"));
-		}
-	}
+	// @PostConstruct
+	// public void runAfterObjectCreated() {
+	// 	if (userRepository.findByEmail("frodo@theshire.me").isEmpty()) {
+	// 		CreateUserRequest userRequest = new CreateUserRequest("Frodo Baggins", "frodo@theshire.me");
+	// 		userService.createUser(userRequest);
+	// 		todoService.createTodo(new CreateTodoRequest("Take the ring to Mordor", "frodo@theshire.me"));
+	// 	}
+	// }
 }
