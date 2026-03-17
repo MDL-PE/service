@@ -7,6 +7,8 @@ import ro.unibuc.prodeng.repository.UserRepository;
 import ro.unibuc.prodeng.request.LoginRequest;
 import ro.unibuc.prodeng.request.RegisterRequest;
 import ro.unibuc.prodeng.response.AuthResponse;
+import ro.unibuc.prodeng.request.ChangePasswordRequest;
+import ro.unibuc.prodeng.response.UserProfileResponse;
 
 @Service
 public class AuthService {
@@ -51,5 +53,29 @@ public class AuthService {
 
         String token = jwtService.generateToken(user.email());
         return new AuthResponse(token, user.username());
+    }
+    public UserProfileResponse getCurrentUserProfile(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        
+        return new UserProfileResponse(user.id(), user.username(), user.email());
+    }
+
+    public void changePassword(String email, ChangePasswordRequest request) {
+        UserEntity user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+
+        if (!passwordEncoder.matches(request.oldPassword(), user.password())) {
+            throw new IllegalArgumentException("Old password is incorrect!");
+        }
+
+        UserEntity updatedUser = new UserEntity(
+            user.id(),
+            user.username(),
+            user.email(),
+            passwordEncoder.encode(request.newPassword())
+        );
+
+        userRepository.save(updatedUser);
     }
 }
