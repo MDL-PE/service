@@ -82,7 +82,7 @@ class UserServiceTest {
             UserEntity entity = invocation.getArgument(0);
             // Simulate MongoDB generating an ID for new entities
             String id = "generated-id-123";
-            return new UserEntity(id, entity.name(), entity.email());
+            return new UserEntity(id, entity.username(), entity.email());
         });
 
         // Act
@@ -105,7 +105,7 @@ class UserServiceTest {
             UserEntity entity = invocation.getArgument(0);
             // Simulate MongoDB generating an ID for new entities
             String id = entity.id() == null ? "generated-id-123" : entity.id();
-            return new UserEntity(id, entity.name(), entity.email());
+            return new UserEntity(id, entity.username(), entity.email());
         });
 
         // Act

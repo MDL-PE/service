@@ -1,7 +1,20 @@
+### Login
+# @name login
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@imdbclone.com",
+  "password": "parolasecreta123"
+}
+
+@authToken = Bearer {{login.response.body.token}}
+
 ### Create a movie
 # @name createMovie
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: {{authToken}}
 
 {
   "title": "The Matrix",
@@ -13,6 +26,7 @@ Content-Type: application/json
 # @name createAnotherMovie
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: {{authToken}}
 
 {
   "title": "Pulp Fiction",
@@ -23,25 +37,32 @@ Content-Type: application/json
 
 ### Get all movies
 GET http://localhost:8080/api/movies
+Authorization: {{authToken}}
 
 ### Get movie by ID
 GET http://localhost:8080/api/movies/{{createMovie.response.body.id}}
+Authorization: {{authToken}}
 
 ### Delete movie
 DELETE http://localhost:8080/api/movies/{{createAnotherMovie.response.body.id}}
+Authorization: {{authToken}}
 
 ### Search movies by title
 GET http://localhost:8080/api/movies/search/title?title=matrix
+Authorization: {{authToken}}
 
 ### Search movies by genre
 GET http://localhost:8080/api/movies/search/genre?genre=Action
+Authorization: {{authToken}}
 
 ### Search movies by year
 GET http://localhost:8080/api/movies/search/year?year=1999
+Authorization: {{authToken}}
 
 ### Add rating to movie
 POST http://localhost:8080/api/movies/{{createMovie.response.body.id}}/rating
 Content-Type: application/json
+Authorization: {{authToken}}
 
 {
   "rating": 9

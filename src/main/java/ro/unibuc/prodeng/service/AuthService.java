@@ -23,10 +23,10 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email-ul este deja folosit!");
+            throw new IllegalArgumentException("Email already used!");
         }
         if (userRepository.existsByUsername(request.username())) {
-            throw new IllegalArgumentException("Username-ul este deja folosit!");
+            throw new IllegalArgumentException("Username already used!");
         }
 
         UserEntity user = new UserEntity(
@@ -43,10 +43,10 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         UserEntity user = userRepository.findByEmail(request.email())
-            .orElseThrow(() -> new IllegalArgumentException("Email sau parolă incorectă"));
+            .orElseThrow(() -> new IllegalArgumentException("Email or password incorrect"));
 
         if (!passwordEncoder.matches(request.password(), user.password())) {
-            throw new IllegalArgumentException("Email sau parolă incorectă");
+            throw new IllegalArgumentException("Email or password incorrect");
         }
 
         String token = jwtService.generateToken(user.email());
