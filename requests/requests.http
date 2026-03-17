@@ -97,3 +97,31 @@ DELETE http://localhost:8080/api/todos/{{createTodo.response.body.id}}
 
 ### Delete user
 DELETE http://localhost:8080/api/users/{{createUser.response.body.id}}
+
+# ==========================================
+# Watchlist Controller Endpoints
+# ==========================================
+
+### Add movie to user's watchlist
+# @name addWatchlistMovie
+POST http://localhost:8080/watchlist/{{createUser.response.body.id}}/movies/100
+Content-Type: application/json
+
+{
+  "movieId": "100"
+}
+
+### Get user's watchlist
+# @name getWatchlist
+GET http://localhost:8080/watchlist/{{createUser.response.body.id}}
+
+### Mark movie as watched
+PATCH http://localhost:8080/watchlist/{{createUser.response.body.id}}/movies/100/watched
+Content-Type: application/json
+
+{
+  "watched": true
+}
+
+### Remove movie from watchlist
+DELETE http://localhost:8080/watchlist/{{createUser.response.body.id}}/movies/100
