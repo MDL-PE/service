@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ro.unibuc.prodeng.request.CreateMovieRequest;
+import ro.unibuc.prodeng.request.MovieRequest;
 import ro.unibuc.prodeng.request.AddRatingRequest;
 import ro.unibuc.prodeng.response.MovieResponse;
 import ro.unibuc.prodeng.service.MovieService;
@@ -37,21 +37,26 @@ public class MovieController {
         return ResponseEntity.ok(movieService.searchByTitle(title));
     }
 
-    @GetMapping("search/genre")
+    @GetMapping("/search/genre")
     public ResponseEntity<List<MovieResponse>> getMoviesByGenre(@RequestParam String genre) {
         return ResponseEntity.ok(movieService.getMoviesByGenre(genre));
     }
 
-    @GetMapping("search/year")
+    @GetMapping("/search/year")
     public ResponseEntity<List<MovieResponse>> getMoviesByYear(@RequestParam int year) {
         return ResponseEntity.ok(movieService.getMoviesByYear(year));
     }
 
     @PostMapping
-    public ResponseEntity<MovieResponse> createMovie(@Valid @RequestBody CreateMovieRequest request) {
+    public ResponseEntity<MovieResponse> createMovie(@Valid @RequestBody MovieRequest request) {
         MovieResponse movie = movieService.createMovie(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(movie);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MovieResponse> updateMovie(@PathVariable String id, @Valid @RequestBody MovieRequest request) {
+        return ResponseEntity.ok(movieService.updateMovie(id, request));
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(@PathVariable String id) {

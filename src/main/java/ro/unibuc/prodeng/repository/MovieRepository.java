@@ -14,4 +14,5 @@ public interface MovieRepository extends MongoRepository<MovieEntity, String> {
 
     List<MovieEntity> findByReleaseYear(int releaseYear);
 
+    boolean existsByTitleIgnoreCaseAndReleaseYear(String title, int releaseYear);
 }

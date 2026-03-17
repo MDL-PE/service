@@ -3,7 +3,7 @@ package ro.unibuc.prodeng.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
-public record CreateMovieRequest(
+public record MovieRequest(
     @NotBlank(message = "Title is required")
     String title,
 
