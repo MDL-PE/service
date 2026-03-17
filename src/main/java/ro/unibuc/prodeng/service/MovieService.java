@@ -3,7 +3,7 @@ package ro.unibuc.prodeng.service;
 import org.springframework.stereotype.Service;
 import ro.unibuc.prodeng.model.MovieEntity;
 import ro.unibuc.prodeng.repository.MovieRepository;
-import ro.unibuc.prodeng.request.CreateMovieRequest;
+import ro.unibuc.prodeng.request.MovieRequest;
 import ro.unibuc.prodeng.request.AddRatingRequest;
 import ro.unibuc.prodeng.response.MovieResponse;
 import ro.unibuc.prodeng.exception.EntityNotFoundException;
@@ -30,7 +30,7 @@ public class MovieService {
     // Returne movie by ID
     public MovieResponse getMovieById(String id) {
         MovieEntity movie = movieRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Movie not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + id));
         return toResponse(movie);
     }
 
@@ -59,16 +59,39 @@ public class MovieService {
     }
 
     // Create new movie
-    public MovieResponse createMovie(CreateMovieRequest request) {
+    public MovieResponse createMovie(MovieRequest request) {
+        validateReleaseYear(request.releaseYear());
+        validateDuplicate(request.title(), request.releaseYear());
+
         MovieEntity movie = new MovieEntity(request.title(), request.genre(), request.releaseYear());
         MovieEntity saved = movieRepository.save(movie);
         return toResponse(saved);
     }
 
+    // Edit movie
+    public MovieResponse updateMovie(String id, MovieRequest request) {
+        validateReleaseYear(request.releaseYear());
+        validateDuplicate(request.title(), request.releaseYear());
+
+        MovieEntity movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + id));
+
+        MovieEntity updated = new MovieEntity(
+                movie.id(),
+                request.title(),
+                request.genre(),
+                request.releaseYear(),
+                movie.averageRating(),
+                movie.ratingCount());
+
+        movieRepository.save(updated);
+        return toResponse(updated);
+    }
+
     // Delete movie with ID
     public void deleteMovie(String id) {
         if (!movieRepository.existsById(id)) {
-            throw new EntityNotFoundException("Movie not found with id: " + id);
+            throw new EntityNotFoundException("Movie with id " + id);
         }
         movieRepository.deleteById(id);
     }
@@ -76,7 +99,7 @@ public class MovieService {
     // Add rating
     public MovieResponse addRating(String movieId, AddRatingRequest request) {
         MovieEntity movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new EntityNotFoundException("Movie not found with id: " + movieId));
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + movieId));
 
         double totalRating = movie.averageRating() * movie.ratingCount();
         int newCount = movie.ratingCount() + 1;
@@ -88,8 +111,7 @@ public class MovieService {
                 movie.genre(),
                 movie.releaseYear(),
                 newAverage,
-                newCount
-        );
+                newCount);
 
         movieRepository.save(updated);
         return toResponse(updated);
@@ -103,7 +125,22 @@ public class MovieService {
                 movie.genre(),
                 movie.releaseYear(),
                 movie.averageRating(),
-                movie.ratingCount()
-        );
+                movie.ratingCount());
+    }
+
+    private void validateReleaseYear(int year) {
+        int currentYear = java.time.Year.now().getValue();
+        if (year < 1888) {
+            throw new IllegalArgumentException("Release year too old");
+        }
+        if (year > currentYear) {
+            throw new IllegalArgumentException("Release year cannot be in the future");
+        }
+    }
+
+    private void validateDuplicate(String title, int year) {
+        if (movieRepository.existsByTitleIgnoreCaseAndReleaseYear(title, year)) {
+            throw new IllegalArgumentException("Movie already exists");
+        }
     }
 }

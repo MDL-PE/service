@@ -19,7 +19,7 @@ Authorization: {{authToken}}
 {
   "title": "The Matrix",
   "genre": "Action",
-  "releaseYear": 1999
+  "releaseYear": 2000
 }
 
 ### Create another movie
@@ -42,6 +42,17 @@ Authorization: {{authToken}}
 ### Get movie by ID
 GET http://localhost:8080/api/movies/{{createMovie.response.body.id}}
 Authorization: {{authToken}}
+
+### Edit movie by ID
+PUT http://localhost:8080/api/movies/{{createMovie.response.body.id}}
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "title": "The Matrix",
+  "genre": "Action",
+  "releaseYear": 1999
+}
 
 ### Delete movie
 DELETE http://localhost:8080/api/movies/{{createAnotherMovie.response.body.id}}
