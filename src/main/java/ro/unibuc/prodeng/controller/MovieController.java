@@ -10,6 +10,7 @@ import ro.unibuc.prodeng.request.AddRatingRequest;
 import ro.unibuc.prodeng.response.MovieResponse;
 import ro.unibuc.prodeng.service.MovieService;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -54,9 +55,10 @@ public class MovieController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MovieResponse> updateMovie(@PathVariable String id, @Valid @RequestBody MovieRequest request) {
+    public ResponseEntity<MovieResponse> updateMovie(@PathVariable String id,
+            @Valid @RequestBody MovieRequest request) {
         return ResponseEntity.ok(movieService.updateMovie(id, request));
-}
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(@PathVariable String id) {
@@ -65,8 +67,11 @@ public class MovieController {
     }
 
     @PostMapping("/{id}/rating")
-    public ResponseEntity<MovieResponse> addRating(@PathVariable String id,
-                                                   @Valid @RequestBody AddRatingRequest request) {
-        return ResponseEntity.ok(movieService.addRating(id, request));
+    public ResponseEntity<MovieResponse> addRating(
+            @PathVariable String id,
+            @RequestParam String userId,
+            @Valid @RequestBody AddRatingRequest request) {
+
+        return ResponseEntity.ok(movieService.addRating(id, userId, request));
     }
 }
