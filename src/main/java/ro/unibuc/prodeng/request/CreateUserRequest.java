@@ -9,5 +9,6 @@ public record CreateUserRequest(
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")
-    String email
+    String email,
+    String role
 ) {}

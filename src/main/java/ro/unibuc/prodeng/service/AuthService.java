@@ -30,16 +30,20 @@ public class AuthService {
         if (userRepository.existsByUsername(request.username())) {
             throw new IllegalArgumentException("Username already used!");
         }
+        
+        String assignedRole = (request.role() != null && request.role().equalsIgnoreCase("ADMIN")) 
+                              ? "ROLE_ADMIN" : "ROLE_USER";
 
         UserEntity user = new UserEntity(
             request.username(),
             request.email(),
-            passwordEncoder.encode(request.password())
+            passwordEncoder.encode(request.password()),
+            assignedRole
         );
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user.email());
+        String token = jwtService.generateToken(user.email(), user.role());
         return new AuthResponse(token, user.username());
     }
 
@@ -51,7 +55,7 @@ public class AuthService {
             throw new IllegalArgumentException("Email or password incorrect");
         }
 
-        String token = jwtService.generateToken(user.email());
+        String token = jwtService.generateToken(user.email(), user.role());
         return new AuthResponse(token, user.username());
     }
     public UserProfileResponse getCurrentUserProfile(String email) {

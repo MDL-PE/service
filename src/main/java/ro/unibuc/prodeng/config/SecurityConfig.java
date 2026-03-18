@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -16,7 +17,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
-    // Injectăm filtrul creat de noi
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }
@@ -32,11 +32,16 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                // Orice altă rută va necesita un token valid:
-                .anyRequest().authenticated() 
+                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() 
+                
+                .requestMatchers(HttpMethod.POST, "/api/movies").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasRole("ADMIN")
+
+                .requestMatchers("/api/movies/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/auth/**").hasAnyRole("USER", "ADMIN")
+                .anyRequest().authenticated()
             )
-            // AICI adăugăm filtrul nostru JWT
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
