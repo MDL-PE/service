@@ -10,6 +10,20 @@ Content-Type: application/json
 
 @authToken = Bearer {{login.response.body.token}}
 
+### Current User Profile
+GET http://localhost:8080/api/auth/me
+Authorization: {{authToken}}
+
+### Change Password
+PUT http://localhost:8080/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "oldPassword": "parolasecreta123",
+  "newPassword": "parolanoua456"
+}
+
 ### Create a movie
 # @name createMovie
 POST http://localhost:8080/api/movies

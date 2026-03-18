@@ -32,7 +32,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Rute publice
+                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 // Orice altă rută va necesita un token valid:
                 .anyRequest().authenticated() 
             )
