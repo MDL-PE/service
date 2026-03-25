@@ -82,7 +82,8 @@ public class MovieService {
                 request.genre(),
                 request.releaseYear(),
                 movie.averageRating(),
-                movie.ratingCount());
+                movie.ratingCount(),
+                movie.userRatings());
 
         movieRepository.save(updated);
         return toResponse(updated);
@@ -97,13 +98,19 @@ public class MovieService {
     }
 
     // Add rating
-    public MovieResponse addRating(String movieId, AddRatingRequest request) {
+    public MovieResponse addRating(String movieId, String userId, AddRatingRequest request) {
         MovieEntity movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new EntityNotFoundException("Movie with id " + movieId));
+
+        if (movie.userRatings().containsKey(userId)) {
+            throw new IllegalArgumentException("User already rated this movie");
+        }
 
         double totalRating = movie.averageRating() * movie.ratingCount();
         int newCount = movie.ratingCount() + 1;
         double newAverage = (totalRating + request.rating()) / newCount;
+
+        movie.userRatings().put(userId, request.rating());
 
         MovieEntity updated = new MovieEntity(
                 movie.id(),
@@ -111,7 +118,8 @@ public class MovieService {
                 movie.genre(),
                 movie.releaseYear(),
                 newAverage,
-                newCount);
+                newCount,
+                movie.userRatings());
 
         movieRepository.save(updated);
         return toResponse(updated);
