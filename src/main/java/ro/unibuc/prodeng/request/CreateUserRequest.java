@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CreateUserRequest(
     @NotBlank(message = "Name is required")
-    String name,
+    String username,
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")

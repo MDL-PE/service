@@ -12,7 +12,12 @@ public record UserEntity(
     String password,
     String role
 ) {
-    public UserEntity(String username, String email, String password, String role) {
-        this(null, username, email, password, role);
+
+    public UserEntity(String username, String email, String role) {
+        this(null, username, email, null, role);
+    }
+
+    public UserEntity(String id, String username, String email, String role) {
+        this(id, username, email, null, role);
     }
 }
