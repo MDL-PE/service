@@ -27,7 +27,7 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    // Returne movie by ID
+    // Return movie by ID
     public MovieResponse getMovieById(String id) {
         MovieEntity movie = movieRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Movie with id " + id));

@@ -1,8 +1,20 @@
+### ADMIN
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 
 {
   "username": "cinefil99",
   "email": "test@imdbclone.com",
-  "password": "parolasecreta123"
+  "password": "parolasecreta123",
+  "role": "ADMIN"
+}
+
+### USER
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "spectator",
+  "email": "user@imdb.com",
+  "password": "parolasecreta"
 }

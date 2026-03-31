@@ -9,9 +9,11 @@ public record UserEntity(
     String id,
     String username,
     String email,
-    String password
+    String password,
+    String role
 ) {
-    public UserEntity(String username, String email, String password) {
-        this(null, username, email, password);
+
+     public UserEntity(String username, String email, String password, String role) {
+        this(null, username, email, password, role);
     }
 }

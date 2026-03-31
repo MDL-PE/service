@@ -44,7 +44,7 @@ class UserControllerTest {
     
     private UserResponse testUser1 = new UserResponse("1", "John Doe", "john@example.com");
     private UserResponse testUser2 = new UserResponse("2", "Jane Smith", "jane@example.com");
-    private CreateUserRequest createUserRequest = new CreateUserRequest("John Doe", "john@example.com");
+    private CreateUserRequest createUserRequest = new CreateUserRequest("John Doe", "john@example.com", "USER");
     private ChangeNameRequest changeNameRequest = new ChangeNameRequest("John Updated");
     
     @BeforeEach
@@ -64,10 +64,10 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is("1")))
-                .andExpect(jsonPath("$[0].name", is("John Doe")))
+                .andExpect(jsonPath("$[0].username", is("John Doe")))
                 .andExpect(jsonPath("$[0].email", is("john@example.com")))
                 .andExpect(jsonPath("$[1].id", is("2")))
-                .andExpect(jsonPath("$[1].name", is("Jane Smith")))
+                .andExpect(jsonPath("$[1].username", is("Jane Smith")))
                 .andExpect(jsonPath("$[1].email", is("jane@example.com")));
         
         verify(userService, times(1)).getAllUsers();
@@ -98,7 +98,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("1")))
-                .andExpect(jsonPath("$.name", is("John Doe")))
+                .andExpect(jsonPath("$.username", is("John Doe")))
                 .andExpect(jsonPath("$.email", is("john@example.com")));
         
         verify(userService, times(1)).getUserById(userId);
@@ -129,7 +129,7 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(createUserRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is("1")))
-                .andExpect(jsonPath("$.name", is("John Doe")))
+                .andExpect(jsonPath("$.username", is("John Doe")))
                 .andExpect(jsonPath("$.email", is("john@example.com")));
         
         verify(userService, times(1)).createUser(any(CreateUserRequest.class));
@@ -148,7 +148,7 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(changeNameRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("1")))
-                .andExpect(jsonPath("$.name", is("John Updated")))
+                .andExpect(jsonPath("$.username", is("John Updated")))
                 .andExpect(jsonPath("$.email", is("john@example.com")));
         
         verify(userService, times(1)).changeName(userId, "John Updated");

@@ -40,6 +40,6 @@ public class AuthController {
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request, Principal principal) {
         authService.changePassword(principal.getName(), request);
-        return ResponseEntity.ok("Parola a fost schimbată cu succes!");
+        return ResponseEntity.ok("Password was changed succesfully!");
     }
 }

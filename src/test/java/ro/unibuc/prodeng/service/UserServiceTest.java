@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -35,8 +36,8 @@ class UserServiceTest {
     // void testGetAllUsers_withMultipleUsers_returnsAllUsers() {
     //     // Arrange
     //     List<UserEntity> users = Arrays.asList(
-    //             new UserEntity("1", "Alice", "alice@example.com"),
-    //             new UserEntity("2", "Bob", "bob@example.com")
+    //             new UserEntity("1", "Alice", "alice@example.com","USER"),
+    //             new UserEntity("2", "Bob", "bob@example.com", "USER")
     //     );
     //     when(userRepository.findAll()).thenReturn(users);
 
@@ -45,14 +46,14 @@ class UserServiceTest {
 
     //     // Assert
     //     assertEquals(2, result.size());
-    //     assertEquals("Alice", result.get(0).name());
-    //     assertEquals("Bob", result.get(1).name());
+    //     assertEquals("Alice", result.get(0).username());
+    //     assertEquals("Bob", result.get(1).username());
     // }
 
     // @Test
     // void testGetUserById_existingUserRequested_returnsUser() throws EntityNotFoundException {
     //     // Arrange
-    //     UserEntity user = new UserEntity("1", "Alice", "alice@example.com");
+    //     UserEntity user = new UserEntity("1", "Alice", "alice@example.com", "USER");
     //     when(userRepository.findById("1")).thenReturn(Optional.of(user));
 
     //     // Act
@@ -60,7 +61,7 @@ class UserServiceTest {
 
     //     // Assert
     //     assertNotNull(result);
-    //     assertEquals("Alice", result.name());
+    //     assertEquals("Alice", result.username());
     //     assertEquals("alice@example.com", result.email());
     // }
 
@@ -76,13 +77,13 @@ class UserServiceTest {
     // @Test
     // void testCreateUser_newUserWithValidData_createsAndReturnsUser() {
     //     // Arrange
-    //     CreateUserRequest request = new CreateUserRequest("Alice", "alice@example.com");
+    //     CreateUserRequest request = new CreateUserRequest("Alice", "alice@example.com", "USER");
     //     when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
     //     when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
     //         UserEntity entity = invocation.getArgument(0);
     //         // Simulate MongoDB generating an ID for new entities
     //         String id = "generated-id-123";
-    //         return new UserEntity(id, entity.username(), entity.email());
+    //         return new UserEntity(id, entity.username(), entity.email(), entity.role());
     //     });
 
     //     // Act
@@ -91,7 +92,7 @@ class UserServiceTest {
     //     // Assert
     //     assertNotNull(result);
     //     assertNotNull(result.id());
-    //     assertEquals("Alice", result.name());
+    //     assertEquals("Alice", result.username());
     //     assertEquals("alice@example.com", result.email());
     //     verify(userRepository, times(1)).save(any(UserEntity.class));
     // }
@@ -99,13 +100,13 @@ class UserServiceTest {
     // @Test
     // void testChangeName_existingUserRequested_changesNameSuccessfully() throws EntityNotFoundException {
     //     // Arrange
-    //     UserEntity existing = new UserEntity("1", "Alice", "alice@example.com");
+    //     UserEntity existing = new UserEntity("1", "Alice", "alice@example.com", "USER");
     //     when(userRepository.findById("1")).thenReturn(Optional.of(existing));
     //     when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
     //         UserEntity entity = invocation.getArgument(0);
     //         // Simulate MongoDB generating an ID for new entities
     //         String id = entity.id() == null ? "generated-id-123" : entity.id();
-    //         return new UserEntity(id, entity.username(), entity.email());
+    //         return new UserEntity(id, entity.username(), entity.email(), entity.role());
     //     });
 
     //     // Act
@@ -114,7 +115,7 @@ class UserServiceTest {
     //     // Assert
     //     assertNotNull(result);
     //     assertEquals("1", result.id());
-    //     assertEquals("Alicia", result.name());
+    //     assertEquals("Alicia", result.username());
     //     assertEquals("alice@example.com", result.email());
     // }
 
