@@ -14,171 +14,189 @@ import ro.unibuc.prodeng.request.MovieRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 @DisplayName("MovieController Integration Tests")
 @AutoConfigureMockMvc(addFilters = false)
 class MovieControllerIntegrationTest extends IntegrationTestBase {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private MovieRepository movieRepository;
+        @Autowired
+        private MovieRepository movieRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void cleanUp() {
-        movieRepository.deleteAll();
-    }
+        @BeforeEach
+        void cleanUp() {
+                movieRepository.deleteAll();
+        }
 
-    private String createMovie(String title, String genre, int year) throws Exception {
-        MovieRequest request = new MovieRequest(title, genre, year);
+        private String createMovie(String title, String genre, int year) throws Exception {
+                MovieRequest request = new MovieRequest(title, genre, year);
 
-        String response = mockMvc.perform(post("/api/movies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(title))
-                .andExpect(jsonPath("$.genre").value(genre))
-                .andExpect(jsonPath("$.releaseYear").value(year))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                String response = mockMvc.perform(post("/api/movies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.title").value(title))
+                                .andExpect(jsonPath("$.genre").value(genre))
+                                .andExpect(jsonPath("$.releaseYear").value(year))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
 
-        return objectMapper.readTree(response).get("id").asText();
-    }
+                return objectMapper.readTree(response).get("id").asText();
+        }
 
-    @Test
-    void testCreateAndGetMovie_validData_success() throws Exception {
-        String movieId = createMovie("Inception", "Sci-Fi", 2010);
+        @Test
+        void testCreateAndGetMovie_validData_success() throws Exception {
+                String movieId = createMovie("Inception", "Sci-Fi", 2010);
 
-        mockMvc.perform(get("/api/movies/" + movieId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Inception"))
-                .andExpect(jsonPath("$.genre").value("Sci-Fi"))
-                .andExpect(jsonPath("$.releaseYear").value(2010));
-    }
+                mockMvc.perform(get("/api/movies/" + movieId))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.title").value("Inception"))
+                                .andExpect(jsonPath("$.genre").value("Sci-Fi"))
+                                .andExpect(jsonPath("$.releaseYear").value(2010));
 
-    @Test
-    void testGetAllMovies_returnsList() throws Exception {
-        createMovie("Movie1", "Action", 2000);
-        createMovie("Movie2", "Drama", 2001);
+                MovieEntity movie = movieRepository.findById(movieId).orElseThrow();
+                Assertions.assertEquals("Inception", movie.title());
+                Assertions.assertEquals("Sci-Fi", movie.genre());
+                Assertions.assertEquals(2010, movie.releaseYear());
 
-        mockMvc.perform(get("/api/movies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
-    }
+        }
 
-    @Test
-    void testUpdateMovie_updatesSuccessfully() throws Exception {
-        String movieId = createMovie("Old Title", "Action", 2000);
+        @Test
+        void testGetAllMovies_returnsList() throws Exception {
+                createMovie("Movie1", "Action", 2000);
+                createMovie("Movie2", "Drama", 2001);
 
-        MovieRequest updateRequest = new MovieRequest("New Title", "Drama", 2001);
+                mockMvc.perform(get("/api/movies"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(2));
 
-        mockMvc.perform(put("/api/movies/" + movieId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("New Title"))
-                .andExpect(jsonPath("$.genre").value("Drama"))
-                .andExpect(jsonPath("$.releaseYear").value(2001));
-    }
+                List<MovieEntity> movies = movieRepository.findAll();
+                Assertions.assertEquals(2, movies.size());
+                Assertions.assertTrue(movies.stream().anyMatch(m -> m.title().equals("Movie1")));
+                Assertions.assertTrue(movies.stream().anyMatch(m -> m.title().equals("Movie2")));
+        }
 
-    @Test
-    void testDeleteMovie_deletesSuccessfully() throws Exception {
-        String movieId = createMovie("To Delete", "Horror", 1999);
+        @Test
+        void testUpdateMovie_updatesSuccessfully() throws Exception {
+                String movieId = createMovie("Old Title", "Action", 2000);
 
-        mockMvc.perform(delete("/api/movies/" + movieId))
-                .andExpect(status().isNoContent());
+                MovieRequest updateRequest = new MovieRequest("New Title", "Drama", 2001);
 
-        mockMvc.perform(get("/api/movies/" + movieId))
-                .andExpect(status().isNotFound());
+                mockMvc.perform(put("/api/movies/" + movieId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.title").value("New Title"))
+                                .andExpect(jsonPath("$.genre").value("Drama"))
+                                .andExpect(jsonPath("$.releaseYear").value(2001));
 
-        Assertions.assertEquals(0, movieRepository.count());
-    }
+                MovieEntity updatedMovie = movieRepository.findById(movieId).orElseThrow();
+                Assertions.assertEquals("New Title", updatedMovie.title());
+                Assertions.assertEquals("Drama", updatedMovie.genre());
+                Assertions.assertEquals(2001, updatedMovie.releaseYear());
+        }
 
-    @Test
-    void testSearchByTitle_returnsMatchingMovies() throws Exception {
-        createMovie("Matrix", "Action", 1999);
-        createMovie("Matrix Reloaded", "Action", 2003);
+        @Test
+        void testDeleteMovie_deletesSuccessfully() throws Exception {
+                String movieId = createMovie("To Delete", "Horror", 1999);
 
-        mockMvc.perform(get("/api/movies/search/title")
-                        .param("title", "matrix"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
-    }
+                mockMvc.perform(delete("/api/movies/" + movieId))
+                                .andExpect(status().isNoContent());
 
-    @Test
-    void testAddRating_updatesAverageAndCount_correctly() throws Exception {
-        String movieId = createMovie("Interstellar", "Sci-Fi", 2014);
+                mockMvc.perform(get("/api/movies/" + movieId))
+                                .andExpect(status().isNotFound());
 
-        mockMvc.perform(post("/api/movies/" + movieId + "/rating")
-                        .param("userId", "user1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rating\": 8}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.averageRating").value(8.0))
-                .andExpect(jsonPath("$.ratingCount").value(1));
+                Assertions.assertEquals(0, movieRepository.count());
+        }
 
-        mockMvc.perform(post("/api/movies/" + movieId + "/rating")
-                        .param("userId", "user2")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rating\": 10}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.averageRating").value(9.0))
-                .andExpect(jsonPath("$.ratingCount").value(2));
+        @Test
+        void testSearchByTitle_returnsMatchingMovies() throws Exception {
+                createMovie("Matrix", "Action", 1999);
+                createMovie("Matrix Reloaded", "Action", 2003);
 
-        MovieEntity movie = movieRepository.findById(movieId).orElseThrow();
+                mockMvc.perform(get("/api/movies/search/title")
+                                .param("title", "matrix"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(2));
+        }
 
-        Assertions.assertEquals(2, movie.ratingCount());
-        Assertions.assertEquals(9.0, movie.averageRating());
-        Assertions.assertEquals(2, movie.userRatings().size());
-    }
+        @Test
+        void testAddRating_updatesAverageAndCount_correctly() throws Exception {
+                String movieId = createMovie("Interstellar", "Sci-Fi", 2014);
 
-    @Test
-    void testCreateMovie_duplicate_throwsBadRequest() throws Exception {
-        createMovie("The Matrix", "Action", 1999);
+                mockMvc.perform(post("/api/movies/" + movieId + "/rating")
+                                .param("userId", "user1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"rating\": 8}"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.averageRating").value(8.0))
+                                .andExpect(jsonPath("$.ratingCount").value(1));
 
-        MovieRequest duplicate = new MovieRequest("The Matrix", "Action", 1999);
+                mockMvc.perform(post("/api/movies/" + movieId + "/rating")
+                                .param("userId", "user2")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"rating\": 10}"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.averageRating").value(9.0))
+                                .andExpect(jsonPath("$.ratingCount").value(2));
 
-        mockMvc.perform(post("/api/movies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(duplicate)))
-                .andExpect(status().isBadRequest());
+                MovieEntity movie = movieRepository.findById(movieId).orElseThrow();
 
-        Assertions.assertEquals(1, movieRepository.count());
-    }
+                Assertions.assertEquals(2, movie.ratingCount());
+                Assertions.assertEquals(9.0, movie.averageRating());
+                Assertions.assertEquals(2, movie.userRatings().size());
+        }
 
-    @Test
-    void testCreateMovie_invalidYear_throwsBadRequest() throws Exception {
-        MovieRequest invalid = new MovieRequest("Future Movie", "Sci-Fi", 3000);
+        @Test
+        void testCreateMovie_duplicate_throwsBadRequest() throws Exception {
+                createMovie("The Matrix", "Action", 1999);
 
-        mockMvc.perform(post("/api/movies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalid)))
-                .andExpect(status().isBadRequest());
+                MovieRequest duplicate = new MovieRequest("The Matrix", "Action", 1999);
 
-        Assertions.assertEquals(0, movieRepository.count());
-    }
+                mockMvc.perform(post("/api/movies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(duplicate)))
+                                .andExpect(status().isBadRequest());
 
-    @Test
-    void testAddRating_sameUserTwice_throwsError() throws Exception {
-        String movieId = createMovie("Dune", "Sci-Fi", 2021);
+                Assertions.assertEquals(1, movieRepository.count());
+        }
 
-        mockMvc.perform(post("/api/movies/" + movieId + "/rating")
-                        .param("userId", "user1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rating\": 9}"))
-                .andExpect(status().isOk());
+        @Test
+        void testCreateMovie_invalidYear_throwsBadRequest() throws Exception {
+                MovieRequest invalid = new MovieRequest("Future Movie", "Sci-Fi", 3000);
 
-        mockMvc.perform(post("/api/movies/" + movieId + "/rating")
-                        .param("userId", "user1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rating\": 10}"))
-                .andExpect(status().isBadRequest());
+                mockMvc.perform(post("/api/movies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalid)))
+                                .andExpect(status().isBadRequest());
 
-        MovieEntity movie = movieRepository.findById(movieId).orElseThrow();
-        Assertions.assertEquals(1, movie.ratingCount());
-    }
+                Assertions.assertEquals(0, movieRepository.count());
+        }
+
+        @Test
+        void testAddRating_sameUserTwice_throwsError() throws Exception {
+                String movieId = createMovie("Dune", "Sci-Fi", 2021);
+
+                mockMvc.perform(post("/api/movies/" + movieId + "/rating")
+                                .param("userId", "user1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"rating\": 9}"))
+                                .andExpect(status().isOk());
+
+                mockMvc.perform(post("/api/movies/" + movieId + "/rating")
+                                .param("userId", "user1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"rating\": 10}"))
+                                .andExpect(status().isBadRequest());
+
+                MovieEntity movie = movieRepository.findById(movieId).orElseThrow();
+                Assertions.assertEquals(1, movie.ratingCount());
+        }
 }
