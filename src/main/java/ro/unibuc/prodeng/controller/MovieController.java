@@ -10,7 +10,6 @@ import ro.unibuc.prodeng.request.AddRatingRequest;
 import ro.unibuc.prodeng.response.MovieResponse;
 import ro.unibuc.prodeng.service.MovieService;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
